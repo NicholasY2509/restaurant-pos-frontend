@@ -1,206 +1,206 @@
 import React, { useState, useEffect } from 'react';
+import { Users, Building, Menu, Table, ShoppingCart, UserCheck, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import apiService from '../services/api';
-import { Tenant, User } from '../types';
-import { 
-  Users, 
-  Building, 
-  Menu, 
-  Table, 
-  ShoppingCart, 
-  TrendingUp,
-  Calendar,
-  Clock
-} from 'lucide-react';
+import { apiService } from '../services/api';
+import { UserRole } from '../types';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const [tenant, setTenant] = useState<Tenant | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [userCount, setUserCount] = useState<{ count: number; limit: number }>({ count: 0, limit: 5 });
+  const [users, setUsers] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const [tenantData, usersData] = await Promise.all([
-          apiService.getCurrentTenant(),
-          apiService.getAllUsers()
-        ]);
-        setTenant(tenantData);
-        setUsers(usersData);
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (user && (user.role === UserRole.ADMIN || user.role === UserRole.MANAGER)) {
+      loadUserStats();
+    }
+  }, [user]);
 
-    fetchDashboardData();
-  }, []);
+  const loadUserStats = async () => {
+    try {
+      const [countData, usersData] = await Promise.all([
+        apiService.getUserCount(),
+        apiService.getUsers()
+      ]);
+      setUserCount(countData);
+      setUsers(usersData);
+    } catch (error) {
+      console.error('Failed to load user stats:', error);
+    }
+  };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
+  const getRoleDisplayName = (role: UserRole) => {
+    switch (role) {
+      case UserRole.ADMIN:
+        return 'Administrator';
+      case UserRole.MANAGER:
+        return 'Manager';
+      case UserRole.WAITER:
+        return 'Waiter';
+      case UserRole.KITCHEN:
+        return 'Kitchen Staff';
+      default:
+        return role;
+    }
+  };
+
+  const getRoleIcon = (role: UserRole) => {
+    switch (role) {
+      case UserRole.ADMIN:
+        return <Shield className="w-6 h-6" />;
+      case UserRole.MANAGER:
+        return <Users className="w-6 h-6" />;
+      default:
+        return <UserCheck className="w-6 h-6" />;
+    }
+  };
+
+  const getRoleColor = (role: UserRole) => {
+    switch (role) {
+      case UserRole.ADMIN:
+        return 'bg-red-500';
+      case UserRole.MANAGER:
+        return 'bg-blue-500';
+      case UserRole.WAITER:
+        return 'bg-green-500';
+      case UserRole.KITCHEN:
+        return 'bg-orange-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
 
   const stats = [
     {
-      title: 'Total Users',
-      value: users.length,
+      name: 'Total Users',
+      value: userCount.count,
+      limit: userCount.limit,
       icon: Users,
       color: 'bg-blue-500',
-      change: '+2 this month'
+      description: 'Active staff members'
     },
     {
-      title: 'Menu Items',
-      value: 0, // Will be implemented when menu module is complete
+      name: 'Menu Items',
+      value: 0,
       icon: Menu,
       color: 'bg-green-500',
-      change: 'Coming soon'
+      description: 'Available menu items'
     },
     {
-      title: 'Tables',
-      value: 0, // Will be implemented when table module is complete
+      name: 'Tables',
+      value: 0,
       icon: Table,
-      color: 'bg-yellow-500',
-      change: 'Coming soon'
+      color: 'bg-purple-500',
+      description: 'Restaurant tables'
     },
     {
-      title: 'Orders Today',
-      value: 0, // Will be implemented when order module is complete
+      name: 'Orders',
+      value: 0,
       icon: ShoppingCart,
-      color: 'bg-purple-500',
-      change: 'Coming soon'
+      color: 'bg-orange-500',
+      description: 'Today\'s orders'
     }
   ];
 
   return (
-    <div className="space-mobile">
-      {/* Header */}
-      <div>
-        <h1 className="text-mobile-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-mobile text-gray-600 mt-2">
-          Welcome back, {user?.firstName}! Here's what's happening with your restaurant.
+    <div className="p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-600">
+          Welcome back, {user?.firstName}! You are logged in as a {getRoleDisplayName(user?.role || UserRole.WAITER)}.
         </p>
       </div>
 
-      {/* Restaurant Info */}
-      {tenant && (
-        <div className="card">
-          <div className="flex-mobile items-center justify-between">
-            <div className="mb-4 sm:mb-0">
-              <h2 className="text-mobile-xl font-semibold text-gray-900">{tenant.name}</h2>
-              <p className="text-mobile text-gray-600">Subdomain: {tenant.subdomain}</p>
-              <p className="text-sm text-gray-500">
-                Status: {tenant.isActive ? 'Active' : 'Inactive'}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500">Created</p>
-              <p className="text-sm font-medium">
-                {new Date(tenant.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Stats Grid */}
-      <div className="grid-mobile">
-        {stats.map((stat, index) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="card">
+            <div key={stat.name} className="bg-white rounded-lg shadow border p-6">
               <div className="flex items-center">
-                <div className={`p-2 sm:p-3 rounded-lg ${stat.color}`}>
-                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <div className={`p-3 rounded-full ${stat.color} text-white`}>
+                  <Icon className="w-6 h-6" />
                 </div>
-                <div className="ml-3 sm:ml-4">
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</p>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">{stat.name}</p>
+                  <div className="flex items-baseline">
+                    <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+                    {stat.limit && (
+                      <p className="ml-2 text-sm text-gray-500">/ {stat.limit}</p>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500">{stat.description}</p>
                 </div>
-              </div>
-              <div className="mt-3 sm:mt-4">
-                <p className="text-sm text-gray-500">{stat.change}</p>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <div className="card">
-          <h3 className="text-mobile-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-          <div className="space-y-3">
-            <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center">
-                <Users className="w-5 h-5 text-primary-600 mr-3" />
-                <span className="font-medium text-mobile">Manage Users</span>
-              </div>
-            </button>
-            <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center">
-                <Building className="w-5 h-5 text-primary-600 mr-3" />
-                <span className="font-medium text-mobile">Update Restaurant Info</span>
-              </div>
-            </button>
-            <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center">
-                <Menu className="w-5 h-5 text-primary-600 mr-3" />
-                <span className="font-medium text-mobile">Manage Menu</span>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        <div className="card">
-          <h3 className="text-mobile-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-          <div className="space-y-4">
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-              <div>
-                <p className="text-sm font-medium">System initialized</p>
-                <p className="text-xs text-gray-500">Just now</p>
-              </div>
+      {/* Role-based Content */}
+      {(user?.role === UserRole.ADMIN || user?.role === UserRole.MANAGER) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* User Management Overview */}
+          <div className="bg-white rounded-lg shadow border p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">User Management</h2>
+            <div className="space-y-4">
+              {Object.values(UserRole).map((role) => {
+                const count = users.filter(user => user.role === role && user.isActive).length;
+                return (
+                  <div key={role} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2 rounded-full ${getRoleColor(role)} text-white`}>
+                        {getRoleIcon(role)}
+                      </div>
+                      <span className="font-medium capitalize">{role}</span>
+                    </div>
+                    <span className="text-lg font-semibold">{count}</span>
+                  </div>
+                );
+              })}
             </div>
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-              <div>
-                <p className="text-sm font-medium">Restaurant account created</p>
-                <p className="text-xs text-gray-500">
-                  {tenant ? new Date(tenant.createdAt).toLocaleDateString() : 'Recently'}
-                </p>
-              </div>
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-sm text-gray-600">
+                {userCount.count} of {userCount.limit} user slots used
+              </p>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Coming Soon Features */}
-      <div className="card">
-        <h3 className="text-mobile-lg font-semibold text-gray-900 mb-4">Coming Soon</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <Menu className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 mb-2" />
-            <h4 className="font-medium text-mobile">Menu Management</h4>
-            <p className="text-sm text-gray-500">Add, edit, and organize your menu items</p>
-          </div>
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <Table className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 mb-2" />
-            <h4 className="font-medium text-mobile">Table Management</h4>
-            <p className="text-sm text-gray-500">Manage restaurant tables and seating</p>
-          </div>
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <ShoppingCart className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 mb-2" />
-            <h4 className="font-medium text-mobile">Order Processing</h4>
-            <p className="text-sm text-gray-500">Process orders and track sales</p>
+          {/* Quick Actions */}
+          <div className="bg-white rounded-lg shadow border p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+            <div className="space-y-3">
+              {user?.role === UserRole.ADMIN && userCount.count < userCount.limit && (
+                <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                  Add New User
+                </button>
+              )}
+              <button className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                View Orders
+              </button>
+              <button className="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                Manage Menu
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Role-specific Dashboard */}
+      {user?.role === UserRole.WAITER && (
+        <div className="bg-white rounded-lg shadow border p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Waiter Dashboard</h2>
+          <p className="text-gray-600">Manage tables and take orders efficiently.</p>
+          {/* Add waiter-specific content */}
+        </div>
+      )}
+
+      {user?.role === UserRole.KITCHEN && (
+        <div className="bg-white rounded-lg shadow border p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Kitchen Dashboard</h2>
+          <p className="text-gray-600">View and manage incoming orders.</p>
+          {/* Add kitchen-specific content */}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,158 +1,245 @@
 # Restaurant POS System - Frontend
 
-A modern React frontend for the multi-tenant Restaurant Point of Sale System.
+A modern React frontend for the multi-tenant Restaurant Point of Sale System with comprehensive role-based access control.
 
-## Features
+## 🚀 Features
 
-- ✅ **Authentication System**
-  - User login/logout
-  - Restaurant registration with tenant creation
-  - JWT token management
-  - Protected routes
+### ✅ **Authentication & Authorization**
+- JWT-based authentication
+- Role-based access control (RBAC)
+- Protected routes and components
+- User profile management
 
-- ✅ **Dashboard**
-  - Overview of restaurant statistics
-  - Quick actions and recent activity
-  - Multi-tenant data isolation
+### ✅ **Role Management System**
+- **4 User Roles**: Admin, Manager, Waiter, Kitchen Staff
+- **Role-based Navigation**: Different menu items based on user role
+- **User Management**: Create, edit, and deactivate users (Admin/Manager only)
+- **Profile Management**: Users can edit their own profile information
+- **Role Guards**: Component-level access control
 
-- ✅ **User Management**
-  - View all users in the restaurant
-  - Search and filter users
-  - Delete users (with confirmation)
-  - Role-based access (admin/staff)
+### ✅ **User Interface**
+- Modern, responsive design with Tailwind CSS
+- Role-specific dashboards
+- User management interface with statistics
+- Profile editing capabilities
+- Toast notifications for user feedback
 
-- ✅ **Restaurant Management**
-  - View and edit restaurant information
-  - Update restaurant name and subdomain
-  - View account status and creation date
+### ✅ **Multi-tenant Support**
+- Tenant-specific data isolation
+- Restaurant-specific branding and settings
 
-- ✅ **Modern UI/UX**
-  - Responsive design with Tailwind CSS
-  - Beautiful icons with Lucide React
-  - Toast notifications
-  - Loading states and error handling
+## 🛠️ Tech Stack
 
-## Tech Stack
+- **React 18** with TypeScript
+- **React Router v6** for navigation
+- **Tailwind CSS** for styling
+- **Lucide React** for icons
+- **React Hot Toast** for notifications
+- **Axios** for API communication
 
-- **React 18** - Modern React with hooks
-- **TypeScript** - Type safety and better development experience
-- **React Router** - Client-side routing
-- **Tailwind CSS** - Utility-first CSS framework
-- **Axios** - HTTP client for API communication
-- **React Hot Toast** - Toast notifications
-- **Lucide React** - Beautiful icons
+## 📋 User Roles & Permissions
 
-## Prerequisites
+### 👑 **Administrator (Admin)**
+- Full system access
+- User management (create, edit, deactivate)
+- Tenant settings management
+- Menu and table management
+- Order management
+- System settings
 
+### 👨‍💼 **Manager**
+- User management (view, edit)
+- Menu and table management
+- Order management
+- Limited tenant settings
+
+### 👨‍💼 **Waiter**
+- Order management
+- Table management
+- Profile management
+- Dashboard access
+
+### 👨‍🍳 **Kitchen Staff**
+- Order viewing and management
+- Profile management
+- Dashboard access
+
+## 🚀 Getting Started
+
+### Prerequisites
 - Node.js 16+ 
 - npm or yarn
 - Backend server running (see backend README)
 
-## Setup
+### Installation
 
 1. **Install Dependencies**
    ```bash
-   cd frontend
    npm install
    ```
 
-2. **Start the Development Server**
+2. **Environment Configuration**
    ```bash
-   npm start
+   cp .env.example .env
+   # Edit .env with your backend API URL
+   VITE_API_URL=http://localhost:3000/api
    ```
 
-The application will be available at `http://localhost:3000`
+3. **Start Development Server**
+   ```bash
+   npm run dev
+   ```
 
-## Environment Configuration
+The application will be available at `http://localhost:5173`
 
-Create a `.env` file in the frontend directory:
-
-```env
-REACT_APP_API_URL=http://localhost:3000/api
-```
-
-## Available Scripts
-
-- `npm start` - Start development server
-- `npm build` - Build for production
-- `npm test` - Run tests
-- `npm eject` - Eject from Create React App
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 src/
-├── components/          # Reusable components
-│   ├── auth/           # Authentication components
-│   └── layout/         # Layout components
+├── components/          # Reusable UI components
+│   ├── RoleGuard.tsx   # Role-based access control
+│   ├── Sidebar.tsx     # Navigation sidebar
+│   └── ...
 ├── contexts/           # React contexts
-├── pages/              # Page components
-├── services/           # API services
-├── types/              # TypeScript type definitions
-├── App.tsx            # Main app component
-└── index.tsx          # Entry point
+│   └── AuthContext.tsx # Authentication state
+├── pages/             # Page components
+│   ├── Dashboard.tsx  # Role-based dashboard
+│   ├── UserManagement.tsx # User management interface
+│   ├── Profile.tsx    # User profile management
+│   └── ...
+├── services/          # API services
+│   └── api.ts        # API communication
+├── types/            # TypeScript type definitions
+│   └── index.ts      # User roles and interfaces
+└── utils/            # Utility functions
 ```
 
-## API Integration
+## 🔐 Role Management Features
 
-The frontend connects to the NestJS backend with the following endpoints:
+### **User Management Interface**
+- View all users in the tenant
+- Create new users (Admin only)
+- Edit user information
+- Deactivate users (Admin only)
+- Role assignment and management
+- User count tracking (max 5 users per tenant)
 
-### Authentication
-- `POST /api/auth/login` - User login
-- `POST /api/auth/register` - Restaurant registration
-- `GET /api/auth/profile` - Get current user
+### **Profile Management**
+- View personal information
+- Edit profile details
+- Change password
+- View role and account status
+- Member since information
 
-### Users
-- `GET /api/users` - Get all users
-- `GET /api/users/:id` - Get specific user
-- `PATCH /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user
+### **Role-based Navigation**
+- Dynamic sidebar based on user role
+- Protected routes and components
+- Role-specific dashboard content
+- Access control at component level
 
-### Tenants
-- `GET /api/tenants/current` - Get current tenant
-- `PATCH /api/tenants/:id` - Update tenant
+## 🎨 UI Components
 
-## Features in Development
+### **RoleGuard Component**
+```tsx
+<RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.MANAGER]}>
+  <UserManagement />
+</RoleGuard>
+```
 
-The following features are planned and will be implemented as the backend modules are completed:
+### **Role-based Sidebar**
+- Automatically shows/hides navigation items based on user role
+- Displays user role and name
+- Role-specific icons and colors
 
-- **Menu Management** - Add, edit, and organize menu items
-- **Table Management** - Manage restaurant tables and seating
-- **Order Processing** - Process orders and track sales
-- **User Profile** - User profile management
-- **Settings** - System configuration
+### **User Management Table**
+- Comprehensive user listing
+- Role badges with colors
+- Status indicators
+- Action buttons (edit, deactivate)
 
-## Authentication Flow
+## 🔧 API Integration
 
-1. **Registration**: New restaurants can register with admin user creation
-2. **Login**: Users authenticate with email/password
-3. **Token Management**: JWT tokens are stored in localStorage
-4. **Protected Routes**: All dashboard routes require authentication
-5. **Auto-logout**: Invalid tokens automatically redirect to login
+The frontend integrates with the backend role management system:
 
-## Multi-tenancy
+- **GET /users** - List all users (Admin/Manager)
+- **POST /users** - Create new user (Admin only)
+- **PATCH /users/:id** - Update user (Admin or self)
+- **DELETE /users/:id** - Deactivate user (Admin only)
+- **GET /users/count** - Get user count (Admin)
+- **GET /users/profile/me** - Get own profile
 
-The system supports multiple restaurants (tenants) with:
-- Isolated data per tenant
-- Unique subdomains
-- Tenant-specific user management
-- Secure data separation
+## 🎯 Usage Examples
 
-## Contributing
+### **Creating a New User (Admin)**
+1. Navigate to User Management
+2. Click "Add User" button
+3. Fill in user details and select role
+4. Submit form
 
-1. Follow the existing code style
-2. Use TypeScript for all new code
-3. Add proper error handling
-4. Test all new features
-5. Update documentation as needed
+### **Editing Profile**
+1. Navigate to Profile
+2. Click "Edit" button
+3. Modify information
+4. Save changes
 
-## Troubleshooting
+### **Role-based Access**
+- Admins see all navigation items
+- Managers see limited management options
+- Waiters see order and table management
+- Kitchen staff see order management only
 
-1. **CORS Issues**: Ensure backend CORS is configured for frontend origin
-2. **API Connection**: Verify backend is running on correct port
-3. **Build Issues**: Clear node_modules and reinstall dependencies
-4. **Type Errors**: Ensure all dependencies are properly installed
+## 🚨 Security Features
 
-## License
+- **JWT Token Management**: Automatic token refresh and storage
+- **Role-based Route Protection**: Routes protected by user role
+- **Component-level Guards**: Individual components protected
+- **API Error Handling**: Proper error messages and redirects
+- **Session Management**: Automatic logout on token expiration
 
-MIT License - see LICENSE file for details 
+## 🔄 State Management
+
+- **AuthContext**: Manages authentication state and user information
+- **Local Storage**: Persists user session and preferences
+- **API Service**: Centralized API communication with error handling
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Responsive navigation
+- Touch-friendly interfaces
+- Optimized for various screen sizes
+
+## 🎨 Styling
+
+- **Tailwind CSS**: Utility-first CSS framework
+- **Custom Components**: Reusable styled components
+- **Role-based Colors**: Different colors for different roles
+- **Consistent Design**: Unified design system
+
+## 🚀 Deployment
+
+### **Build for Production**
+```bash
+npm run build
+```
+
+### **Preview Production Build**
+```bash
+npm run preview
+```
+
+## 🤝 Contributing
+
+1. Follow the existing code structure
+2. Use TypeScript for type safety
+3. Implement role-based access control
+4. Add proper error handling
+5. Test with different user roles
+
+## 📄 License
+
+This project is part of the Restaurant POS System.
+
+---
+
+**Note**: This frontend is designed to work with the NestJS backend. Make sure the backend is running and properly configured before using the frontend. 

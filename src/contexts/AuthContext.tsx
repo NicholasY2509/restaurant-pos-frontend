@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, AuthResponse } from '../types';
+import { User, AuthResponse, RegisterData } from '../types';
 import apiService from '../services/api';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: any) => Promise<void>;
+  register: (userData: RegisterData) => Promise<void>;
   logout: () => void;
+  updateUser: (userData: User) => void;
   isAuthenticated: boolean;
 }
 
@@ -31,23 +32,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const token = localStorage.getItem('authToken');
-      const savedUser = localStorage.getItem('user');
-      
-      if (token && savedUser) {
-        try {
-          const userData = JSON.parse(savedUser);
-          setUser(userData);
-          
-          // Verify token is still valid
-          await apiService.getProfile();
-        } catch (error) {
-          // Token is invalid, clear storage
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('user');
+      try {
+        const token = localStorage.getItem('authToken');
+        const savedUser = localStorage.getItem('user');
+        
+        if (token && savedUser) {
+          try {
+            const userData = JSON.parse(savedUser);
+            // Set user immediately to prevent flickering
+            setUser(userData);
+            
+            // Verify token is still valid by calling getProfile
+            const currentUser = await apiService.getProfile();
+            setUser(currentUser);
+            localStorage.setItem('user', JSON.stringify(currentUser));
+          } catch (error) {
+            console.log('Token verification failed, clearing auth data');
+            // Token is invalid, clear storage
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            setUser(null);
+          }
+        } else {
+          // No token or user data, ensure we're logged out
+          setUser(null);
         }
+      } catch (error) {
+        console.error('Error during auth initialization:', error);
+        // On any error, clear auth data and set user to null
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     initializeAuth();
@@ -55,27 +73,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
+      setLoading(true);
       const response: AuthResponse = await apiService.login({ email, password });
       
+      // Set token and user data
       localStorage.setItem('authToken', response.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));
       
       setUser(response.user);
     } catch (error) {
+      console.error('Login error:', error);
+      // Ensure we're in a clean state on login failure
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      setUser(null);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const register = async (userData: any) => {
+  const register = async (userData: RegisterData) => {
     try {
+      setLoading(true);
       const response: AuthResponse = await apiService.register(userData);
       
+      // Set token and user data
       localStorage.setItem('authToken', response.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));
       
       setUser(response.user);
     } catch (error) {
+      console.error('Register error:', error);
+      // Ensure we're in a clean state on registration failure
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      setUser(null);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,12 +121,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
   };
 
+  const updateUser = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
+
   const value: AuthContextType = {
     user,
     loading,
     login,
     register,
     logout,
+    updateUser,
     isAuthenticated: !!user,
   };
 

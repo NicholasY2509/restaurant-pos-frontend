@@ -4,10 +4,10 @@ import { Tenant } from '../types';
 import { toast } from 'react-hot-toast';
 import { Building, Edit, Save, X, Globe, Calendar } from 'lucide-react';
 import { logger, logUserAction } from '../utils/logger';
+import { useTenant } from '../contexts/TenantContext';
 
 const TenantPage: React.FC = () => {
-  const [tenant, setTenant] = useState<Tenant | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { tenant, refreshTenant, loading } = useTenant();
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -15,34 +15,21 @@ const TenantPage: React.FC = () => {
   });
 
   useEffect(() => {
-    fetchTenant();
-  }, []);
-
-  const fetchTenant = async () => {
-    try {
-      logger.info('Fetching current tenant information');
-      const data = await apiService.getCurrentTenant();
-      setTenant(data);
+    if (tenant) {
       setFormData({
-        name: data.name,
-        subdomain: data.subdomain,
+        name: tenant.name,
+        subdomain: tenant.subdomain,
       });
-      logger.info('Successfully fetched tenant information', { tenantId: data.id, name: data.name });
-    } catch (error) {
-      logger.error('Failed to fetch restaurant information', error as Error);
-      toast.error('Failed to fetch restaurant information');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [tenant]);
 
   const handleSave = async () => {
     if (!tenant) return;
 
     try {
       logUserAction('Updating tenant information', { tenantId: tenant.id, changes: formData });
-      const updatedTenant = await apiService.updateTenant(tenant.id, formData);
-      setTenant(updatedTenant);
+      await apiService.updateTenant(tenant.id, formData);
+      await refreshTenant(); // Refresh the tenant context
       setEditing(false);
       logger.info('Successfully updated tenant information', { tenantId: tenant.id });
       toast.success('Restaurant information updated successfully');

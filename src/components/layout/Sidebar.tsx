@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTenant } from '../../contexts/TenantContext';
 import { 
   Home, 
   Users, 
@@ -20,6 +21,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { user, logout } = useAuth();
+  const { tenant } = useTenant();
   const location = useLocation();
 
   const menuItems = [
@@ -39,12 +41,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
   return (
     <div className="bg-white shadow-lg w-64 min-h-screen flex flex-col">
-      {/* Header with close button for mobile */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-primary-600">Restaurant POS</h1>
-            <p className="text-sm text-gray-600 mt-1">Point of Sale System</p>
+            <h1 className="text-2xl font-bold text-primary-600">
+              {tenant ? tenant.name : 'Restaurant POS'}
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
+              {tenant ? 'Admin Dashboard' : 'Point of Sale System'}
+            </p>
           </div>
           {onClose && (
             <button

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
+import { useTenant } from '../../contexts/TenantContext';
 import { Menu, X } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -8,6 +9,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { tenant } = useTenant();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -46,7 +48,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h1 className="text-lg font-semibold text-gray-900">Restaurant POS</h1>
+            <div className="text-center flex-1">
+              <h1 className="text-lg font-semibold text-gray-900">
+                {tenant ? tenant.name : 'Restaurant POS'}
+              </h1>
+              <p className="text-xs text-gray-500">Admin Dashboard</p>
+            </div>
             <div className="w-10"></div> {/* Spacer for centering */}
           </div>
         </header>

@@ -1,13 +1,53 @@
 // User types
+export enum UserRole {
+  ADMIN = 'admin',
+  MANAGER = 'manager',
+  WAITER = 'waiter',
+  KITCHEN = 'kitchen'
+}
+
 export interface User {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
-  role: 'admin' | 'staff';
-  tenantId: number;
+  role: UserRole;
+  isActive: boolean;
+  tenantId: string;
   createdAt: string;
   updatedAt: string;
+  fullName?: string;
+}
+
+export interface CreateUserDto {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  role?: UserRole;
+}
+
+export interface UpdateUserDto {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  role?: UserRole;
+  isActive?: boolean;
+}
+
+export interface UserCountResponse {
+  count: number;
+  limit: number;
+}
+
+export interface RegisterData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  restaurantName: string;
+  subdomain: string;
 }
 
 // Tenant types
