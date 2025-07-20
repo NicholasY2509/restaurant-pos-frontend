@@ -3,8 +3,9 @@ import apiService from '../services/api';
 import { Tenant } from '../types';
 import { toast } from 'react-hot-toast';
 import { Building, Edit, Save, X, Globe, Calendar } from 'lucide-react';
+import { logger, logUserAction } from '../utils/logger';
 
-const Tenant: React.FC = () => {
+const TenantPage: React.FC = () => {
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -19,13 +20,16 @@ const Tenant: React.FC = () => {
 
   const fetchTenant = async () => {
     try {
+      logger.info('Fetching current tenant information');
       const data = await apiService.getCurrentTenant();
       setTenant(data);
       setFormData({
         name: data.name,
         subdomain: data.subdomain,
       });
+      logger.info('Successfully fetched tenant information', { tenantId: data.id, name: data.name });
     } catch (error) {
+      logger.error('Failed to fetch restaurant information', error as Error);
       toast.error('Failed to fetch restaurant information');
     } finally {
       setLoading(false);
@@ -36,11 +40,14 @@ const Tenant: React.FC = () => {
     if (!tenant) return;
 
     try {
+      logUserAction('Updating tenant information', { tenantId: tenant.id, changes: formData });
       const updatedTenant = await apiService.updateTenant(tenant.id, formData);
       setTenant(updatedTenant);
       setEditing(false);
+      logger.info('Successfully updated tenant information', { tenantId: tenant.id });
       toast.success('Restaurant information updated successfully');
     } catch (error) {
+      logger.error('Failed to update restaurant information', error as Error, { tenantId: tenant.id });
       toast.error('Failed to update restaurant information');
     }
   };
@@ -73,17 +80,17 @@ const Tenant: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-mobile">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Restaurant Information</h1>
-          <p className="text-gray-600 mt-2">Manage your restaurant details and settings</p>
+      <div className="flex-mobile justify-between items-start sm:items-center">
+        <div className="mb-4 sm:mb-0">
+          <h1 className="text-mobile-3xl font-bold text-gray-900">Restaurant Information</h1>
+          <p className="text-mobile text-gray-600 mt-2">Manage your restaurant details and settings</p>
         </div>
         {!editing && (
           <button
             onClick={() => setEditing(true)}
-            className="btn-primary flex items-center"
+            className="btn-primary flex items-center w-full sm:w-auto justify-center"
           >
             <Edit className="w-4 h-4 mr-2" />
             Edit
@@ -93,7 +100,7 @@ const Tenant: React.FC = () => {
 
       {/* Restaurant Info Card */}
       <div className="card">
-        <div className="space-y-6">
+        <div className="space-mobile">
           {/* Restaurant Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -188,17 +195,17 @@ const Tenant: React.FC = () => {
 
           {/* Action Buttons */}
           {editing && (
-            <div className="flex space-x-3 pt-4 border-t border-gray-200">
+            <div className="flex-mobile space-y-3 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-200">
               <button
                 onClick={handleSave}
-                className="btn-primary flex items-center"
+                className="btn-primary flex items-center justify-center w-full sm:w-auto"
               >
                 <Save className="w-4 h-4 mr-2" />
                 Save Changes
               </button>
               <button
                 onClick={handleCancel}
-                className="btn-secondary flex items-center"
+                className="btn-secondary flex items-center justify-center w-full sm:w-auto"
               >
                 <X className="w-4 h-4 mr-2" />
                 Cancel
@@ -209,39 +216,39 @@ const Tenant: React.FC = () => {
       </div>
 
       {/* Additional Info */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
+          <h3 className="text-mobile-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600">Account Type:</span>
-              <span className="font-medium">Multi-tenant SaaS</span>
+              <span className="text-gray-600 text-mobile">Account Type:</span>
+              <span className="font-medium text-mobile">Multi-tenant SaaS</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Subscription:</span>
-              <span className="font-medium text-green-600">Active</span>
+              <span className="text-gray-600 text-mobile">Subscription:</span>
+              <span className="font-medium text-green-600 text-mobile">Active</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Plan:</span>
-              <span className="font-medium">Starter</span>
+              <span className="text-gray-600 text-mobile">Plan:</span>
+              <span className="font-medium text-mobile">Starter</span>
             </div>
           </div>
         </div>
 
         <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">System Information</h3>
+          <h3 className="text-mobile-lg font-semibold text-gray-900 mb-4">System Information</h3>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600">API Version:</span>
-              <span className="font-medium">v1.0.0</span>
+              <span className="text-gray-600 text-mobile">API Version:</span>
+              <span className="font-medium text-mobile">v1.0.0</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Database:</span>
-              <span className="font-medium">MySQL</span>
+              <span className="text-gray-600 text-mobile">Database:</span>
+              <span className="font-medium text-mobile">MySQL</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Backend:</span>
-              <span className="font-medium">NestJS</span>
+              <span className="text-gray-600 text-mobile">Backend:</span>
+              <span className="font-medium text-mobile">NestJS</span>
             </div>
           </div>
         </div>
@@ -250,4 +257,4 @@ const Tenant: React.FC = () => {
   );
 };
 
-export default Tenant; 
+export default TenantPage; 

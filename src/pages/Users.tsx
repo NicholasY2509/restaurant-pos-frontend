@@ -51,14 +51,14 @@ const Users: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-mobile">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Users</h1>
-          <p className="text-gray-600 mt-2">Manage your restaurant staff and users</p>
+      <div className="flex-mobile justify-between items-start sm:items-center">
+        <div className="mb-4 sm:mb-0">
+          <h1 className="text-mobile-3xl font-bold text-gray-900">Users</h1>
+          <p className="text-mobile text-gray-600 mt-2">Manage your restaurant staff and users</p>
         </div>
-        <button className="btn-primary flex items-center">
+        <button className="btn-primary flex items-center w-full sm:w-auto justify-center">
           <Plus className="w-4 h-4 mr-2" />
           Add User
         </button>
@@ -78,8 +78,8 @@ const Users: React.FC = () => {
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="card">
+      {/* Users Table - Desktop */}
+      <div className="hidden lg:block card">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -149,7 +149,51 @@ const Users: React.FC = () => {
             </tbody>
           </table>
         </div>
+      </div>
 
+      {/* Users Cards - Mobile */}
+      <div className="lg:hidden space-y-4">
+        {filteredUsers.map((user) => (
+          <div key={user.id} className="card">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                  <UsersIcon className="w-6 h-6 text-primary-600" />
+                </div>
+                <div className="ml-4">
+                  <div className="text-mobile font-medium text-gray-900">
+                    {user.firstName} {user.lastName}
+                  </div>
+                  <div className="text-sm text-gray-500">{user.email}</div>
+                  <div className="flex items-center mt-1">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      user.role === 'admin' 
+                        ? 'bg-red-100 text-red-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {user.role}
+                    </span>
+                    <span className="text-xs text-gray-500 ml-2">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex space-x-2">
+                <button className="p-2 text-primary-600 hover:text-primary-900 hover:bg-primary-50 rounded-lg">
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button 
+                  className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg"
+                  onClick={() => handleDeleteUser(user.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+        
         {filteredUsers.length === 0 && (
           <div className="text-center py-12">
             <UsersIcon className="mx-auto h-12 w-12 text-gray-400" />
@@ -162,27 +206,27 @@ const Users: React.FC = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="card">
           <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <UsersIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+              <UsersIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
             </div>
-            <div className="ml-4">
+            <div className="ml-3 sm:ml-4">
               <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{users.length}</p>
             </div>
           </div>
         </div>
         
         <div className="card">
           <div className="flex items-center">
-            <div className="p-3 bg-red-100 rounded-lg">
-              <UsersIcon className="w-6 h-6 text-red-600" />
+            <div className="p-2 sm:p-3 bg-red-100 rounded-lg">
+              <UsersIcon className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
             </div>
-            <div className="ml-4">
+            <div className="ml-3 sm:ml-4">
               <p className="text-sm font-medium text-gray-600">Admins</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 {users.filter(u => u.role === 'admin').length}
               </p>
             </div>
@@ -191,12 +235,12 @@ const Users: React.FC = () => {
         
         <div className="card">
           <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <UsersIcon className="w-6 h-6 text-green-600" />
+            <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+              <UsersIcon className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
             </div>
-            <div className="ml-4">
+            <div className="ml-3 sm:ml-4">
               <p className="text-sm font-medium text-gray-600">Staff</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 {users.filter(u => u.role === 'staff').length}
               </p>
             </div>

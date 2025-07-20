@@ -10,10 +10,15 @@ import {
   ShoppingCart, 
   Settings, 
   LogOut,
-  User
+  User,
+  X
 } from 'lucide-react';
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  onClose?: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
 
@@ -33,10 +38,23 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="bg-white shadow-lg w-64 min-h-screen">
-      <div className="p-6">
-        <h1 className="text-2xl font-bold text-primary-600">Restaurant POS</h1>
-        <p className="text-sm text-gray-600 mt-1">Point of Sale System</p>
+    <div className="bg-white shadow-lg w-64 min-h-screen flex flex-col">
+      {/* Header with close button for mobile */}
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-primary-600">Restaurant POS</h1>
+            <p className="text-sm text-gray-600 mt-1">Point of Sale System</p>
+          </div>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
       </div>
       
       <nav className="mt-6">
@@ -82,7 +100,7 @@ const Sidebar: React.FC = () => {
         </ul>
       </nav>
 
-      <div className="absolute bottom-0 w-64 p-4">
+      <div className="mt-auto p-4 border-t border-gray-200">
         <button
           onClick={handleLogout}
           className="flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"

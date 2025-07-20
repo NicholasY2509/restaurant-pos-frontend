@@ -14,7 +14,7 @@
 
 @layer components {
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply px-3 py-2 sm:px-4 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 text-sm sm:text-base;
   }
   
   .btn-primary {
@@ -30,10 +30,59 @@
   }
   
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6;
+  }
+
+  /* Mobile-first responsive utilities */
+  .container-mobile {
+    @apply w-full px-4 sm:px-6 lg:px-8;
+  }
+
+  .text-mobile {
+    @apply text-sm sm:text-base;
+  }
+
+  .text-mobile-lg {
+    @apply text-base sm:text-lg;
+  }
+
+  .text-mobile-xl {
+    @apply text-lg sm:text-xl;
+  }
+
+  .text-mobile-2xl {
+    @apply text-xl sm:text-2xl;
+  }
+
+  .text-mobile-3xl {
+    @apply text-2xl sm:text-3xl;
+  }
+
+  .grid-mobile {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
+  }
+
+  .flex-mobile {
+    @apply flex flex-col sm:flex-row;
+  }
+
+  .space-mobile {
+    @apply space-y-4 sm:space-y-6;
+  }
+
+  .p-mobile {
+    @apply p-4 sm:p-6;
+  }
+
+  .px-mobile {
+    @apply px-4 sm:px-6;
+  }
+
+  .py-mobile {
+    @apply py-4 sm:py-6;
   }
 } 

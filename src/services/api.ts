@@ -7,6 +7,7 @@ import {
   Tenant,
   ApiResponse 
 } from '../types';
+import { logger, logApiError, logUserAction } from '../utils/logger';
 
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -37,9 +38,19 @@ class ApiService {
 
     // Add response interceptor to handle auth errors
     this.api.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        logger.info(`API Success: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+          status: response.status,
+          url: response.config.url,
+          method: response.config.method
+        });
+        return response;
+      },
       (error) => {
+        logApiError(`${error.config?.method?.toUpperCase()} ${error.config?.url}`, error);
+        
         if (error.response?.status === 401) {
+          logger.warn('Authentication failed, redirecting to login', error);
           localStorage.removeItem('authToken');
           localStorage.removeItem('user');
           window.location.href = '/login';
