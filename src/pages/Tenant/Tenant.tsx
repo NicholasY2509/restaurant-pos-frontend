@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import apiService from '../services/api';
-import { Tenant } from '../types';
+import apiService from '../../services/api';
+import { Tenant } from '../../types';
 import { toast } from 'react-hot-toast';
 import { Building, Edit, Save, X, Globe, Calendar } from 'lucide-react';
-import { logger, logUserAction } from '../utils/logger';
-import { useTenant } from '../contexts/TenantContext';
+import { logger, logUserAction } from '../../utils/logger';
+import { useTenant } from '../../contexts/TenantContext';
 
 const TenantPage: React.FC = () => {
   const { tenant, refreshTenant, loading } = useTenant();

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, UserPlus, Users, Shield } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { apiService } from '../services/api';
-import { User, UserRole, CreateUserDto, UpdateUserDto } from '../types';
-import { RoleGuard } from '../components/RoleGuard';
+import { apiService } from '../../services/api';
+import { User, UserRole, CreateUserDto, UpdateUserDto } from '../../types';
+import { RoleGuard } from '../../components/RoleGuard';
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);

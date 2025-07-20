@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Building, Menu, Table, ShoppingCart, UserCheck, Shield } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { apiService } from '../services/api';
-import { UserRole } from '../types';
+import { useAuth } from '../../contexts/AuthContext';
+import { apiService } from '../../services/api';
+import { UserRole } from '../../types';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();

@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 
-// You can define types here or import from types file
+// Menu Item Types
 interface MenuItem {
   id: number;
   name: string;
@@ -25,6 +25,33 @@ interface UpdateMenuItemRequest {
   price?: number;
   category?: string;
   isAvailable?: boolean;
+}
+
+// Category Types
+export interface Category {
+  id: number;
+  name: string;
+  description: string;
+  color: string;
+  isActive: boolean;
+  itemCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCategoryRequest {
+  name: string;
+  description: string;
+  color: string;
+  tenantId: number;
+}
+
+export interface UpdateCategoryRequest {
+  name?: string;
+  description?: string;
+  color?: string;
+  isActive?: boolean;
+  tenantId?: number;
 }
 
 export class MenuEndpoints {
@@ -61,6 +88,36 @@ export class MenuEndpoints {
 
   async toggleMenuItemAvailability(id: number): Promise<MenuItem> {
     const response = await this.api.patch<MenuItem>(`/menu/${id}/toggle-availability`);
+    return response.data;
+  }
+
+  // Category Management Methods
+  async getAllCategories(): Promise<Category[]> {
+    const response = await this.api.get<Category[]>('/menu-categories');
+    return response.data;
+  }
+
+  async getCategory(id: number): Promise<Category> {
+    const response = await this.api.get<Category>(`/menu-categories/${id}`);
+    return response.data;
+  }
+
+  async createCategory(data: CreateCategoryRequest): Promise<Category> {
+    const response = await this.api.post<Category>('/menu-categories', data);
+    return response.data;
+  }
+
+  async updateCategory(id: number, data: UpdateCategoryRequest): Promise<Category> {
+    const response = await this.api.patch<Category>(`/menu-categories/${id}`, data);
+    return response.data;
+  }
+
+  async deleteCategory(id: number): Promise<void> {
+    await this.api.delete(`/menu-categories/${id}`);
+  }
+
+  async toggleCategoryStatus(id: number): Promise<Category> {
+    const response = await this.api.patch<Category>(`/menu-categories/${id}/toggle-status`);
     return response.data;
   }
 } 

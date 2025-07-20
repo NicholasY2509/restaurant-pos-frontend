@@ -5,37 +5,54 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import DashboardLayout from './components/layout/DashboardLayout';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
-import Dashboard from './pages/Dashboard';
-import UserManagement from './pages/UserManagement';
-import Profile from './pages/Profile';
-import TenantPage from './pages/Tenant';
+import Dashboard from './pages/Dashboard/Dashboard';
+import UserManagement from './pages/UserManagement/UserManagement';
+import Profile from './pages/Profile/Profile';
+import TenantPage from './pages/Tenant/Tenant';
+import MenuItems from './pages/MenuManagement/MenuItems/MenuItems';
+import Categories from './pages/MenuManagement/Categories/Categories';
+import Modifiers from './pages/MenuManagement/Modifiers/Modifiers';
 import LogsViewer from './components/debug/LogsViewer';
 import './index.css';
 import ErrorBoundary from './components/ErrorBoundary';
 import { TenantProvider } from './contexts/TenantContext';
 import TenantTitle from './components/TenantTitle';
 
-// Protected Route Component
+// Route configuration types
+interface RouteConfig {
+  path: string;
+  component?: React.ComponentType;
+  element?: React.ReactNode;
+  redirect?: string;
+  children?: RouteConfig[];
+}
+
+// Loading component
+const LoadingSpinner: React.FC = () => (
+  <div className="flex items-center justify-center h-screen bg-gray-50">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p className="text-gray-600">Loading...</p>
+    </div>
+  </div>
+);
+
+// Placeholder component for coming soon pages
+const ComingSoonPage: React.FC<{ title: string; description?: string }> = ({ 
+  title, 
+  description = "Coming soon! This feature is under development." 
+}) => (
+  <div className="text-center py-12">
+    <h1 className="text-3xl font-bold text-gray-900 mb-4">{title}</h1>
+    <p className="text-gray-600">{description}</p>
+  </div>
+);
+
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
 
-  // Show loading spinner while auth state is being determined
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Redirect to login if not authenticated
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
+  if (loading) return <LoadingSpinner />;
+  if (!user) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
 
@@ -43,24 +60,67 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
 
-  // Show loading spinner while auth state is being determined
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Redirect to dashboard if already authenticated
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
+  if (loading) return <LoadingSpinner />;
+  if (user) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
+};
+
+// Wrapper for protected routes with dashboard layout
+const ProtectedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ProtectedRoute>
+    <DashboardLayout>
+      {children}
+    </DashboardLayout>
+  </ProtectedRoute>
+);
+
+// Route configuration
+const routes: RouteConfig[] = [
+  { path: '/login', component: LoginForm, element: <PublicRoute><LoginForm /></PublicRoute> },
+  { path: '/register', component: RegisterForm, element: <PublicRoute><RegisterForm /></PublicRoute> },
+  
+  { path: '/dashboard', component: Dashboard },
+  { path: '/users', component: UserManagement },
+  { path: '/profile', component: Profile },
+  { path: '/tenant', component: TenantPage },
+  
+  { path: '/menu', redirect: '/menu/items' },
+  { path: '/menu/items', component: MenuItems },
+  { path: '/menu/categories', component: Categories },
+  { path: '/menu/modifiers', component: Modifiers },
+  
+  // Coming soon pages
+  { 
+    path: '/tables', 
+    element: <ComingSoonPage title="Table Management" />
+  },
+  { 
+    path: '/orders', 
+    element: <ComingSoonPage title="Order Management" />
+  },
+  { 
+    path: '/settings', 
+    element: <ComingSoonPage title="Settings" />
+  },
+];
+
+// Component mapping for dynamic imports
+const componentMap: Record<string, React.ComponentType> = {
+  Dashboard,
+  UserManagement,
+  Profile,
+  TenantPage,
+};
+
+// Render route element
+const renderRouteElement = (route: RouteConfig): React.ReactNode => {
+  if (route.element) return route.element;
+  if (route.component) {
+    const Component = route.component;
+    return <ProtectedLayout><Component /></ProtectedLayout>;
+  }
+  if (route.redirect) return <Navigate to={route.redirect} replace />;
+  return null;
 };
 
 function App() {
@@ -72,108 +132,19 @@ function App() {
             <div className="min-h-screen bg-gray-50">
               <TenantTitle />
               <Routes>
-                {/* Public Routes */}
-                <Route path="/login" element={<PublicRoute><LoginForm /></PublicRoute>} />
-                <Route path="/register" element={<PublicRoute><RegisterForm /></PublicRoute>} />
-                
-                {/* Protected Routes */}
-                <Route 
-                  path="/dashboard" 
-                  element={
-                    <ProtectedRoute>
-                      <DashboardLayout>
-                        <Dashboard />
-                      </DashboardLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/users" 
-                  element={
-                    <ProtectedRoute>
-                      <DashboardLayout>
-                        <UserManagement />
-                      </DashboardLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/profile" 
-                  element={
-                    <ProtectedRoute>
-                      <DashboardLayout>
-                        <Profile />
-                      </DashboardLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/tenant" 
-                  element={
-                    <ProtectedRoute>
-                      <DashboardLayout>
-                        <TenantPage />
-                      </DashboardLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/menu" 
-                  element={
-                    <ProtectedRoute>
-                      <DashboardLayout>
-                        <div className="text-center py-12">
-                          <h1 className="text-3xl font-bold text-gray-900 mb-4">Menu Management</h1>
-                          <p className="text-gray-600">Coming soon! This feature is under development.</p>
-                        </div>
-                      </DashboardLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/tables" 
-                  element={
-                    <ProtectedRoute>
-                      <DashboardLayout>
-                        <div className="text-center py-12">
-                          <h1 className="text-3xl font-bold text-gray-900 mb-4">Table Management</h1>
-                          <p className="text-gray-600">Coming soon! This feature is under development.</p>
-                        </div>
-                      </DashboardLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/orders" 
-                  element={
-                    <ProtectedRoute>
-                      <DashboardLayout>
-                        <div className="text-center py-12">
-                          <h1 className="text-3xl font-bold text-gray-900 mb-4">Order Management</h1>
-                          <p className="text-gray-600">Coming soon! This feature is under development.</p>
-                        </div>
-                      </DashboardLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/settings" 
-                  element={
-                    <ProtectedRoute>
-                      <DashboardLayout>
-                        <div className="text-center py-12">
-                          <h1 className="text-3xl font-bold text-gray-900 mb-4">Settings</h1>
-                          <p className="text-gray-600">Coming soon! This feature is under development.</p>
-                        </div>
-                      </DashboardLayout>
-                    </ProtectedRoute>
-                  } 
-                />
+                {/* Generated routes from configuration */}
+                {routes.map((route) => (
+                  <Route
+                    key={route.path}
+                    path={route.path}
+                    element={renderRouteElement(route)}
+                  />
+                ))}
                 
                 {/* Debug Routes */}
                 <Route path="/debug/logs" element={<LogsViewer />} />
                 
-                {/* Default Route */}
+                {/* Default Routes */}
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>

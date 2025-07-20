@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { User, Edit, Save, X, Shield, Users, UserCheck } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext';
-import { apiService } from '../services/api';
-import { UserRole, UpdateUserDto } from '../types';
+import { useAuth } from '../../contexts/AuthContext';
+import { apiService } from '../../services/api';
+import { UserRole, UpdateUserDto } from '../../types';
 
 const Profile: React.FC = () => {
   const { user, updateUser } = useAuth();
