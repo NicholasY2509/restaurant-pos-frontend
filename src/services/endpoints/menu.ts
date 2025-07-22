@@ -1,12 +1,15 @@
 import { AxiosInstance } from 'axios';
 
 // Menu Item Types
-interface MenuItem {
+export interface MenuItem {
   id: number;
   name: string;
   description: string;
   price: number;
-  category: string;
+  categoryId: string;
+  category: Category;
+  imageUrl: string;
+  preparationTime: number;
   isAvailable: boolean;
   createdAt: string;
   updatedAt: string;
@@ -16,7 +19,9 @@ interface CreateMenuItemRequest {
   name: string;
   description: string;
   price: number;
-  category: string;
+  categoryId: string;
+  imageUrl: string;
+  preparationTime: number;
 }
 
 interface UpdateMenuItemRequest {
@@ -27,7 +32,6 @@ interface UpdateMenuItemRequest {
   isAvailable?: boolean;
 }
 
-// Category Types
 export interface Category {
   id: number;
   name: string;
@@ -58,36 +62,36 @@ export class MenuEndpoints {
   constructor(private api: AxiosInstance) {}
 
   async getAllMenuItems(): Promise<MenuItem[]> {
-    const response = await this.api.get<MenuItem[]>('/menu');
+    const response = await this.api.get<MenuItem[]>('/menu-items');
     return response.data;
   }
 
   async getMenuItem(id: number): Promise<MenuItem> {
-    const response = await this.api.get<MenuItem>(`/menu/${id}`);
+    const response = await this.api.get<MenuItem>(`/menu-items/${id}`);
     return response.data;
   }
 
   async createMenuItem(data: CreateMenuItemRequest): Promise<MenuItem> {
-    const response = await this.api.post<MenuItem>('/menu', data);
+    const response = await this.api.post<MenuItem>('/menu-items', data);
     return response.data;
   }
 
   async updateMenuItem(id: number, data: UpdateMenuItemRequest): Promise<MenuItem> {
-    const response = await this.api.patch<MenuItem>(`/menu/${id}`, data);
+    const response = await this.api.patch<MenuItem>(`/menu-items/${id}`, data);
     return response.data;
   }
 
   async deleteMenuItem(id: number): Promise<void> {
-    await this.api.delete(`/menu/${id}`);
+    await this.api.delete(`/menu-items/${id}`);
   }
 
   async getMenuByCategory(category: string): Promise<MenuItem[]> {
-    const response = await this.api.get<MenuItem[]>(`/menu/category/${category}`);
+    const response = await this.api.get<MenuItem[]>(`/menu-items/category/${category}`);
     return response.data;
   }
 
   async toggleMenuItemAvailability(id: number): Promise<MenuItem> {
-    const response = await this.api.patch<MenuItem>(`/menu/${id}/toggle-availability`);
+    const response = await this.api.patch<MenuItem>(`/menu-items/${id}/toggle-availability`);
     return response.data;
   }
 
