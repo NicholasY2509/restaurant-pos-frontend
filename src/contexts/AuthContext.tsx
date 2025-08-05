@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser(userData);
             
             // Verify token is still valid by calling getProfile
-            const currentUser = await apiService.getProfile();
+            const currentUser = await apiService.auth.getProfile();
             setUser(currentUser);
             localStorage.setItem('user', JSON.stringify(currentUser));
           } catch (error) {
@@ -74,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const response: AuthResponse = await apiService.login({ email, password });
+      const response: AuthResponse = await apiService.auth.login({ email, password });
       
       // Set token and user data
       localStorage.setItem('authToken', response.access_token);
@@ -96,7 +96,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (userData: RegisterData) => {
     try {
       setLoading(true);
-      const response: AuthResponse = await apiService.register(userData);
+      const response: AuthResponse = await apiService.auth.register(userData);
       
       // Set token and user data
       localStorage.setItem('authToken', response.access_token);

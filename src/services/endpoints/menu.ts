@@ -13,6 +13,7 @@ export interface MenuItem {
   isAvailable: boolean;
   createdAt: string;
   updatedAt: string;
+  modifiers?: any[];
 }
 
 interface CreateMenuItemRequest {

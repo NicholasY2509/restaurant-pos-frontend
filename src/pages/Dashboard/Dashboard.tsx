@@ -18,8 +18,8 @@ const Dashboard: React.FC = () => {
   const loadUserStats = async () => {
     try {
       const [countData, usersData] = await Promise.all([
-        apiService.getUserCount(),
-        apiService.getUsers()
+        apiService.users.getUserCount(),
+        apiService.users.getAllUsers()
       ]);
       setUserCount(countData);
       setUsers(usersData);

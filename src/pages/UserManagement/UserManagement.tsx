@@ -28,7 +28,7 @@ const UserManagement: React.FC = () => {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const data = await apiService.getUsers();
+      const data = await apiService.users.getAllUsers();
       setUsers(data);
     } catch (error) {
       toast.error('Failed to load users');
@@ -39,7 +39,7 @@ const UserManagement: React.FC = () => {
 
   const loadUserCount = async () => {
     try {
-      const data = await apiService.getUserCount();
+      const data = await apiService.users.getUserCount();
       setUserCount(data);
     } catch (error) {
       console.error('Failed to load user count:', error);
@@ -49,7 +49,7 @@ const UserManagement: React.FC = () => {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiService.createUser(formData);
+      await apiService.users.createUser(formData);
       toast.success('User created successfully');
       setShowCreateModal(false);
       setFormData({ firstName: '', lastName: '', email: '', password: '', role: UserRole.WAITER });
@@ -76,7 +76,7 @@ const UserManagement: React.FC = () => {
         updateData.password = formData.password;
       }
       
-      await apiService.updateUserById(selectedUser.id, updateData);
+      await apiService.users.updateUserById(selectedUser.id, updateData);
       toast.success('User updated successfully');
       setShowEditModal(false);
       setSelectedUser(null);
@@ -91,7 +91,7 @@ const UserManagement: React.FC = () => {
     if (!window.confirm('Are you sure you want to deactivate this user?')) return;
     
     try {
-      await apiService.deactivateUser(userId);
+      await apiService.users.deactivateUser(userId);
       toast.success('User deactivated successfully');
       loadUsers();
       loadUserCount();

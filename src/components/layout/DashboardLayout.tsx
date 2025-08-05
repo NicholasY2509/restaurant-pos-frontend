@@ -37,9 +37,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         <Sidebar onClose={closeSidebar} />
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col lg:ml-0">
-        {/* Mobile Header */}
         <header className="lg:hidden bg-white shadow-sm border-b border-gray-200 px-4 py-3">
           <div className="flex items-center justify-between">
             <button
@@ -59,11 +57,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto">
           <div className="p-4 lg:p-6">
-            {children}
-          </div>
-        </main>
+          {children}
+        </div>
+      </main>
       </div>
     </div>
   );

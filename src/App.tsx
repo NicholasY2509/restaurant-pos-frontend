@@ -131,10 +131,10 @@ function App() {
           <Router>
             <div className="min-h-screen bg-gray-50">
               <TenantTitle />
-              <Routes>
+    <Routes>
                 {/* Generated routes from configuration */}
                 {routes.map((route) => (
-                  <Route
+      <Route 
                     key={route.path}
                     path={route.path}
                     element={renderRouteElement(route)}
@@ -145,27 +145,27 @@ function App() {
                 <Route path="/debug/logs" element={<LogsViewer />} />
                 
                 {/* Default Routes */}
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
-              </Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
               
               {/* LogsViewer - Always available as floating button */}
               <LogsViewer />
-              
-              <Toaster 
-                position="top-right"
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: '#363636',
-                    color: '#fff',
-                  },
-                }}
-              />
+
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+          }}
+        />
             </div>
-          </Router>
+      </Router>
         </TenantProvider>
-      </AuthProvider>
+    </AuthProvider>
     </ErrorBoundary>
   );
 }

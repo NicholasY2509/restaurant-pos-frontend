@@ -42,7 +42,7 @@ logger.error('Failed to save data', error, { component: 'UserForm', action: 'sav
 import { logApiError } from '../utils/logger';
 
 try {
-  const data = await apiService.getUsers();
+  const data = await apiService.users.getAllUsers();
 } catch (error) {
   logApiError('getUsers', error, { userId: 123 });
 }
@@ -115,7 +115,7 @@ const UserProfile: React.FC = () => {
     const fetchUser = async () => {
       try {
         logger.info('Fetching user profile');
-        const data = await apiService.getProfile();
+        const data = await apiService.auth.getProfile();
         setUser(data);
         logger.info('User profile loaded successfully', { userId: data.id });
       } catch (error) {

@@ -26,7 +26,7 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
       setLoading(true);
       setError(null);
       logger.info('Fetching tenant information for context');
-      const tenantData = await apiService.getCurrentTenant();
+      const tenantData = await apiService.tenants.getCurrentTenant();
       setTenant(tenantData);
       logger.info('Tenant information loaded successfully', { tenantId: tenantData.id, name: tenantData.name });
     } catch (err) {

@@ -43,7 +43,7 @@ const Profile: React.FC = () => {
         updateData.password = formData.password;
       }
 
-      const updatedUser = await apiService.updateUserById(user.id, updateData);
+      const updatedUser = await apiService.users.updateUserById(user.id, updateData);
       updateUser(updatedUser);
       toast.success('Profile updated successfully');
       setIsEditing(false);

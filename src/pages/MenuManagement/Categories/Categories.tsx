@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 import { useTenant } from '../../../contexts/TenantContext';
 import CategoriesTable from './CategoriesTable';
 import CategoryFormModal from './CategoryFormModal';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 
 const Categories: React.FC = () => {
   const { tenant } = useTenant();
@@ -13,6 +15,7 @@ const Categories: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState<CreateCategoryRequest>({
     name: '',
@@ -22,7 +25,6 @@ const Categories: React.FC = () => {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch categories from API
   const fetchCategories = async () => {
     try {
       setLoading(true);
@@ -100,12 +102,11 @@ const Categories: React.FC = () => {
   };
 
   const handleDeleteCategory = async (category: Category) => {
-    if (!window.confirm(`Are you sure you want to delete "${category.name}"?`)) {
-      return;
-    }
     try {
       await apiService.menu.deleteCategory(category.id);
       toast.success('Category deleted successfully');
+      setShowDeleteModal(false);
+      setSelectedCategory(null);
       fetchCategories();
     } catch (error) {
       console.error('Error deleting category:', error);
@@ -167,7 +168,10 @@ const Categories: React.FC = () => {
       <CategoriesTable
         categories={categories}
         onEdit={openEditModal}
-        onDelete={handleDeleteCategory}
+        onDelete={(category: Category) => {
+          setShowDeleteModal(true);
+          setSelectedCategory(category);
+        }}
         onToggleStatus={handleToggleStatus}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -190,6 +194,30 @@ const Categories: React.FC = () => {
         submitting={submitting}
         isEdit={true}
       />
+      <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Category</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete this category?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (selectedCategory) {
+                handleDeleteCategory(selectedCategory);
+              }
+            }}
+            disabled={!selectedCategory}
+          >
+            Delete
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

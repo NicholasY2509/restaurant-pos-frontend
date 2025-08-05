@@ -28,7 +28,7 @@ const TenantPage: React.FC = () => {
 
     try {
       logUserAction('Updating tenant information', { tenantId: tenant.id, changes: formData });
-      await apiService.updateTenant(tenant.id, formData);
+      await apiService.tenants.updateTenant(tenant.id, formData);
       await refreshTenant(); // Refresh the tenant context
       setEditing(false);
       logger.info('Successfully updated tenant information', { tenantId: tenant.id });

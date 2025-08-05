@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye, Edit, Trash2, Tag, Settings } from 'lucide-react';
 import { MenuItem } from '../../../services/endpoints/menu';
 
 interface MenuItemsTableProps {
@@ -7,11 +7,18 @@ interface MenuItemsTableProps {
   onView: (item: MenuItem) => void;
   onEdit: (item: MenuItem) => void;
   onDelete: (item: MenuItem) => void;
+  onManageModifiers: (item: MenuItem) => void;
 }
 
 const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
-const MenuItemsTable: React.FC<MenuItemsTableProps> = ({ items, onView, onEdit, onDelete }) => {
+const MenuItemsTable: React.FC<MenuItemsTableProps> = ({ 
+  items, 
+  onView, 
+  onEdit, 
+  onDelete, 
+  onManageModifiers 
+}) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {items.map((item) => (
@@ -46,17 +53,50 @@ const MenuItemsTable: React.FC<MenuItemsTableProps> = ({ items, onView, onEdit, 
               <span className="text-lg font-bold text-primary-600">Rp {Number(item.price).toLocaleString('id-ID')}</span>
               <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{item.category.name}</span>
             </div>
-            {/* Action Buttons */}
+
+            {/* Modifiers Section */}
+            {item.modifiers && item.modifiers.length > 0 && (
+              <div className="mb-4">
+                <div className="flex items-center mb-2">
+                  <Tag className="w-4 h-4 text-gray-500 mr-1" />
+                  <span className="text-sm font-medium text-gray-700">Modifiers ({item.modifiers.length})</span>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {item.modifiers.slice(0, 3).map((modifier: any, index: number) => (
+                    <span key={index} className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                      {modifier.name}
+                      {modifier.price > 0 && ` (+${modifier.price})`}
+                    </span>
+                  ))}
+                  {item.modifiers.length > 3 && (
+                    <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">
+                      +{item.modifiers.length - 3} more
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2">
-              <button className="flex-1 flex items-center justify-center px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" onClick={() => onView(item)}>
-                <Eye className="w-4 h-4 mr-1" />
-                View
+              <button 
+                onClick={() => onManageModifiers(item)}
+                className="flex-1 flex items-center justify-center px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                title="Manage modifiers"
+              >
+                <Settings className="w-4 h-4 mr-1" />
+                Modifiers
               </button>
-              <button className="flex-1 flex items-center justify-center px-3 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors" onClick={() => onEdit(item)}>
+              <button 
+                onClick={() => onEdit(item)}
+                className="flex-1 flex items-center justify-center px-3 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+              >
                 <Edit className="w-4 h-4 mr-1" />
                 Edit
               </button>
-              <button className="flex-1 flex items-center justify-center px-3 py-2 text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors" onClick={() => onDelete(item)}>
+              <button 
+                onClick={() => onDelete(item)}
+                className="flex-1 flex items-center justify-center px-3 py-2 text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+              >
                 <Trash2 className="w-4 h-4 mr-1" />
                 Delete
               </button>
